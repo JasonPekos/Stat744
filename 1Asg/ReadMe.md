@@ -1,6 +1,6 @@
 # Asg 1 for data visualization 
 
-These types of countries-scaled-by-metric graphs are awful. They aren’t necessarily misleading, but the presentation is ridiculous, and I don’t think it adds anything aesthetically either. I keep seeing them in sponsored ads / explore feed posts on social media, so I’ve grabbed a few to complain about.
+I don't like these types of countries-scaled-by-metric graphs. They aren’t necessarily misleading, but the presentation is ridiculous, and I don’t think it adds anything aesthetically either. I keep seeing them in sponsored ads / explore feed posts on social media, so I’ve grabbed a few to go over in this assignment.
 
 ## Graph One:
 
@@ -30,9 +30,9 @@ I find this graph to be borderline unreadable, which is a shame because it looks
 <img src="https://raw.githubusercontent.com/JasonPekos/Stat744/main/1Asg/Asg1Graph2.jpg" width="400" height="400" />
 
 
-This is identical, but now we encode the same metric in two ways: distance out from the centre point and size. We encode continent by colour. The same Cleveland hierarchy issues remain, but now we rank on a common scale — which is _better_, but this is a really weird common scale!
+This is identical, but now we encode the metric we care about (changed to unemployment)  in two ways: distance out from the centre point and size. We encode continent by colour. The same Cleveland hierarchy issues remain, but now we rank on a common scale — which is _better_, but this is a really weird common scale!
 
-Here we also add the law of continuity for our more important debt metric, instead of wasting it on geography. This is a lot better! I still think this graph is still really bad though. 
+Here we also add the law of continuity for our more important unemployment metric, instead of wasting it on geography. This is a lot better! I still think this graph is still really bad though, for a couple of reasons:
 
 ## Other Nitpicks:
 
