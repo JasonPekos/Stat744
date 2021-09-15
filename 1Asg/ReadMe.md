@@ -5,6 +5,7 @@ These types of countries-scaled-by-metric graphs are awful. They aren’t necess
 ## Graph One:
 
 
+<img src="https://raw.githubusercontent.com/JasonPekos/Stat744/main/1Asg/Asg1Graph1.jpg" width="400" height="350" />
 
 Going down the Cleveland list of encoding importance for example one:
 
@@ -25,6 +26,9 @@ I find this graph to be borderline unreadable, which is a shame because it looks
 
 
 ## Graph Two:
+
+<img src="https://raw.githubusercontent.com/JasonPekos/Stat744/main/1Asg/Asg1Graph2.jpg" width="400" height="400" />
+
 
 This is identical, but now we encode the same metric in two ways: distance out from the centre point and size. We encode continent by colour. The same Cleveland hierarchy issues remain, but now we rank on a common scale — which is _better_, but this is a really weird common scale!
 
