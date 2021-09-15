@@ -42,7 +42,17 @@ Here we also add the law of continuity for our more important unemployment metri
 
 3. In graph two, angle doesn't really seem to encode anything, but they plot everything on a circle anyways. It's like an even more useless pie chart. 
 
-4. Using country shape as essentially a 'marker' is bizarre; there's no reason to think it correlates with debt at all, and it makes comparing ratios so much harder than e.g. circular markers. for reasons in point (1.)
+4. It is difficult to find any specific country because there is no clear order to skim the labels in
+	- e.g try finding fiji or malta
+	
+5. Oceana and Europe are essentially the same shade of teal (look at fiji again)
+
+6. Inconsistent text size, colour,  and boldness is a bit of an eyesore. 
+
+
+		
+
+
 
 
 
