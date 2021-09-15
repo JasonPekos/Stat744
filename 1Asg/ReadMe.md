@@ -1,8 +1,8 @@
-#Asg 1 for data visualization 
+# Asg 1 for data visualization 
 
 These types of countries-scaled-by-metric graphs are awful. They aren’t necessarily misleading, but the presentation is ridiculous, and I don’t think it adds anything aesthetically either. I keep seeing them in sponsored ads / explore feed posts on social media, so I’ve grabbed a few to complain about.
 
-##Graph One:
+## Graph One:
 
 
 
@@ -24,13 +24,13 @@ Going down the Cleveland list of encoding importance for example one:
 I find this graph to be borderline unreadable, which is a shame because it looks like it took a lot of work — it isn't even like there is some deception intended here. Just a really bad graph. 
 
 
-##Graph Two:
+## Graph Two:
 
 This is identical, but now we encode the same metric in two ways: distance out from the centre point and size. We encode continent by colour. The same Cleveland hierarchy issues remain, but now we rank on a common scale — which is _better_, but this is a really weird common scale!
 
 Here we also add the law of continuity for our more important debt metric, instead of wasting it on geography. This is a lot better! I still think this graph is really terrible though. 
 
-##Other Nitpicks:
+## Other Nitpicks:
 
 1. you can't really even compare ratios due to wildly different country shapes (e.g try comparing Chile vs Barbados in Graph Two)
 
