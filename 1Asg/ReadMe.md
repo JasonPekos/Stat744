@@ -49,7 +49,9 @@ Here we also add the law of continuity for our more important unemployment metri
 
 6. Inconsistent text size, colour,  and boldness is a bit of an eyesore. 
 
+## JD
 
+Nicely put together and nice explanations. Grade: 2.2/3
 		
 
 
