@@ -1,5 +1,7 @@
 library(tidyverse)
 library(mgcv)
+library(ggplot2)
+library(ggthemes)
 
 #read in data
 df = readr::read_csv("https://mac-theobio.github.io/DataViz/data/vaccine_data_online.csv")
@@ -53,10 +55,10 @@ ggplot(data = df_minimal, aes(x = year, y = cases, color = post_date)) +
   geom_vline(xintercept = bp,
              linetype = "dashed") +
   labs(y = "cases", x = "year", color = "Vaccine \nAvailable?") +
-  ggtitle("Recorded Measles Cases Before and After Introduction of Vaccine") +
-  annotate(x=bp,y=+Inf,label=" < Vaccine Introduced",vjust=3, hjust = -0.11, geom="label") 
-
-
+  ggtitle("Measles Cases Before and After Introduction of Vaccine") +
+  annotate(x=bp,y=+Inf,label=" < Vaccine Introduced",vjust=3, hjust = -0.11, geom="label") +
+  theme_fivethirtyeight() +
+  scale_shape_tableau()
 
 
 
