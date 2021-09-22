@@ -2,6 +2,8 @@ library(tidyverse)
 library(mgcv)
 library(ggplot2)
 library(ggthemes)
+options(scipen=10000)
+
 
 #read in data
 df = readr::read_csv("https://mac-theobio.github.io/DataViz/data/vaccine_data_online.csv")
@@ -59,6 +61,7 @@ ggplot(data = df_minimal, aes(x = year, y = cases, color = post_date)) +
   annotate(x=bp,y=+Inf,label=" < Vaccine Introduced",vjust=3, hjust = -0.11, geom="label") +
   theme_fivethirtyeight() +
   scale_shape_tableau()
+  
 
 
 
