@@ -7,10 +7,7 @@ df = readr::read_csv("https://mac-theobio.github.io/DataViz/data/vaccine_data_on
 #get rid of the non-measles data, and useless columns which are only used for other data (all FALSE here)
 df_minimal = filter(df, disease == "Measles")[1:5]
 
-#check to make sure everything is working (commented out)
-#print(as_tibble(df_minimal), n = 70)
-
-#make first plot
+#make first plot, just smoothed time series plot
 ggplot(data = df_minimal, aes(x = year, y = cases)) +
   geom_smooth() + 
   geom_point(shape = 4) +
@@ -24,7 +21,6 @@ ggplot(data = df_minimal, aes(x = year, y = cases)) +
 # which sends .. probably a bad (&wrong) message. I plotted the actual points
 # which helps a little, but I still think this is bad, so I'm decreasing the loess span
 
-
 ggplot(data = df_minimal, aes(x = year, y = cases)) +
   geom_smooth(span = 0.09) + #method = mgcv::gam()
   geom_point(shape = 4) +
@@ -33,10 +29,12 @@ ggplot(data = df_minimal, aes(x = year, y = cases)) +
              linetype = "dashed")+
   labs(y = "cases", x = "year")
 
+#Much better! But I think it would look good fitting a seperate smooth to either 
+#side of the breakpoint
 
-
-##Discontinuity Attempt 
-#specify the breakpoint year because I was running into issue with nested verbs
+##Discontinuity Attempt starts here
+#first, specify the breakpoint year because I was running into issue with nested verbs
+#just sets bp = 1964(?)
 
 bp = filter(df_minimal,vaccine != FALSE)$year
 
@@ -44,13 +42,14 @@ bp = filter(df_minimal,vaccine != FALSE)$year
 #for mutate + iflelse troubleshooting help
 #nvm in the end it was a bracket issue :-/
 #credit to https://stackoverflow.com/a/61702104/12369476
-#for vline label also 
+#for vline label help also 
 
+#make before /  after vaccine categories 
 df_minimal %>% mutate(post_date = ifelse(year > bp,"yes","no")) -> df_minimal
 
 ggplot(data = df_minimal, aes(x = year, y = cases, color = post_date)) +
-  geom_smooth(span = 0.5) + #method = mgcv::gam()
-  geom_point(shape = 4) +
+  geom_smooth(span = 0.5) + 
+  geom_point(shape = 4)   +
   geom_vline(xintercept = bp,
              linetype = "dashed") +
   labs(y = "cases", x = "year", color = "Vaccine \nAvailable?") +
