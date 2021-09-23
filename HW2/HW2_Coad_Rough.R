@@ -63,6 +63,54 @@ ggplot(data = df_minimal, aes(x = year, y = cases, color = post_date)) +
   scale_shape_tableau()
   
 
+#Now for Plot Two
+
+#first, make a new dataframe for our inlet
+
+dummyvec = integer(2)
+cumsumvec = c(tail(cumsum(df_minimal$cases[01:19]),n = 1),
+              tail(cumsum(df_minimal$cases[20:70]),n = 1))
+class = c("before", "after")
+df_dummy = tibble(dummyvec, cumsumvec,class)
+
+
+
+
+
+# using help from this answer: 
+#https://stackoverflow.com/a/50876626/12369476
+# and this answer:
+#https://stackoverflow.com/a/52841737/12369476
+
+main = ggplot(data = df_minimal, aes( x = year, y = cases)) +
+  geom_bar(stat="identity") +
+  ggtitle("Measles Cases Before and After Introduction of Vaccine") +
+  annotate(x=bp,y=+Inf,
+           label=" < Vaccine Introduced",
+           vjust=2,
+           hjust = -0.10,
+           fill = "lightgrey",
+           geom="label") +
+  geom_vline(xintercept = bp, linetype = "dashed") +
+  theme_fivethirtyeight()
+
+areaplot = ggplot(data = df_dummy, aes(x = dummyvec, y = dummyvec, size = cumsumvec, color = class)) +
+    geom_point(alpha = 0.5) +
+    scale_size(range = c(20,50)) +
+    theme(legend.position="none")
+
+areaplot2 = ggplot(data = df_dummy, aes(1, y =  cumsumvec, fill = class)) +
+  geom_bar(position = "identity", stat = "identity", alpha = 0.8) +
+  theme_fivethirtyeight()
+
+main
+areaplot
+areaplot2
+
+# main + annotation_custom(
+#   ggplotGrob(main), 
+#   xmin = 5, xmax = 7, ymin = 30, ymax = 44
+# )
 
 
 
