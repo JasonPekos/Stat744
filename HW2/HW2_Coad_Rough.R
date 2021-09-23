@@ -70,11 +70,10 @@ ggplot(data = df_minimal, aes(x = year, y = cases, color = post_date)) +
 dummyvec = integer(2)
 cumsumvec = c(tail(cumsum(df_minimal$cases[01:19]),n = 1),
               tail(cumsum(df_minimal$cases[20:70]),n = 1))
+
+cumsumvec = cumsumvec / (sqrt(sum(cumsumvec^2))) #normalize for bubble scale param
 class = c("before", "after")
 df_dummy = tibble(dummyvec, cumsumvec,class)
-
-
-
 
 
 # using help from this answer: 
@@ -94,18 +93,39 @@ main = ggplot(data = df_minimal, aes( x = year, y = cases)) +
   geom_vline(xintercept = bp, linetype = "dashed") +
   theme_fivethirtyeight()
 
-areaplot = ggplot(data = df_dummy, aes(x = dummyvec, y = dummyvec, size = cumsumvec, color = class)) +
-    geom_point(alpha = 0.5) +
-    scale_size(range = c(20,50)) +
-    theme(legend.position="none")
+bubblescale = 70 #makes bubble larger while retaining area
+rev(df_dummy) #reverse order of columns for opacity reasons
 
+#source for help for making transparent background: 
+#https://stackoverflow.com/a/41878833/12369476
+areaplot = ggplot(data = df_dummy, aes(x = dummyvec, y = dummyvec, size = cumsumvec, color = class)) +
+    geom_point(alpha = 0.7) +
+    scale_size(range = c(bubblescale * cumsumvec[1],
+                         bubblescale * cumsumvec[2])) +
+    theme(legend.position="none") +
+    theme(axis.title.x=element_blank(),
+          axis.text.x=element_blank(),
+          axis.ticks.x=element_blank(),
+          axis.title.y=element_blank(),
+          axis.text.y=element_blank(),
+          axis.ticks.y=element_blank())+
+  theme(panel.background = element_rect(fill = "transparent"),
+        plot.background = element_rect(fill = "transparent", color = NA),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank())
+
+
+#not using this anymore — bar plot instead of bubble
 areaplot2 = ggplot(data = df_dummy, aes(1, y =  cumsumvec, fill = class)) +
   geom_bar(position = "identity", stat = "identity", alpha = 0.8) +
   theme_fivethirtyeight()
 
-main
-areaplot
-areaplot2
+#now, add the inlet into the main plot
+library(cowplot)
+fullplot = ggdraw() + draw_plot(main) +
+  draw_plot(areaplot, x = 0.4, y = .23, width = .7, height = .7)
+
+fullplot
 
 # main + annotation_custom(
 #   ggplotGrob(main), 
