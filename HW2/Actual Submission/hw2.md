@@ -19,7 +19,14 @@
 
 ---
 
-*Q2*: based on these data, create 2 ggplots that display the data in a different way from the original; use the 2 plots to illustrate tradeoffs between different graphical principles. (If you’re feeling truly uncreative, one of your plots can replicate the original graphical design.) You do not need to worry about the dynamic-graphics aspect or the historical events shown in the original display
+*Q2*: based on these data, create 2 ggplots that display the data in a different way from the original; use the 2 plots to illustrate tradeoffs between different graphical principles. (If you’re feeling truly uncreative, one of your plots can replicate the original graphical design.) You do not need to worry about the dynamic-graphics aspect or the historical events shown in the original display.
+
+
+
+
+## Graph One
+
+For my first graph, I tried simply representing the data as a scatterplot: the Wilke book seems to suggest that this is a pretty good first step with time series data. The main issue is that there is a pretty large amount of noise
 
 
 
