@@ -106,8 +106,8 @@ areaplot = ggplot(data = df_dummy, aes(x = dummyvec, y = dummyvec,
                                        size = cumsumvec_normalized,
                                        color = class)) +
     geom_point(alpha = 0.7) +
-    scale_size(range = c(bubblescale * cumsumvec[2],
-                         bubblescale * cumsumvec[1])) +
+    scale_size(range = c(bubblescale * cumsumvec_normalized[2],
+                         bubblescale * cumsumvec_normalized[1])) +
     theme(legend.position="none") +
     scale_color_manual(values=c('#999999','#E69F00')) +
   
@@ -164,11 +164,14 @@ areaplot2 = ggplot(data = df_dummy, aes(1, y =  cumsumvec, fill = class)) +
 #now, add the inlet into the main plot
 library(cowplot)
 fullplot = ggdraw() + draw_plot(main) +
+  #draw_plot(areaplot, x = 0.4, y = .23, width = .7, height = .7)+
   draw_plot(areaplot2, x = 0.70, y = .53, width = .2, height = .3) +
   scale_x_continuous("",breaks=c(.5,2.5),labels=c("Low types","High types") ) 
 
 
 fullplot
+
+
 
 
 # main + annotation_custom(
