@@ -38,9 +38,7 @@ This is pretty bad — I think the way that the points after the vaccine drag d
 I'd like to fix this, so I replaced the LOESS fit with a regression discontinuity model centred at 1964. 
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/JasonPekos/Stat744/main/HW2/AsgPlot1.png
-" width="350" title="Second Attempt at First Attempt">
-
+  <img src="https://raw.githubusercontent.com/JasonPekos/Stat744/main/HW2/AsgPlot1.png" width="350" title="Second Attempt at First Attempt">
 </p>
 
 
