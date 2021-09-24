@@ -30,7 +30,6 @@ For my first graph, I tried simply representing the data as a scatterplot: the W
 
 <p align="center">
   <img src="https://raw.githubusercontent.com/JasonPekos/Stat744/main/HW2/RplotLOESSsimple.png" width="350" title="First Attempt">
-
 </p>
 
 This is pretty bad — I think the way that the points after the vaccine drag down the LOESS fit before the vaccine date is misleading: it makes it look like the vaccine had no impact, and really there is some other trend driving this. 
@@ -64,9 +63,7 @@ I actually couldn't get what I wanted to do here to work — my initial plan was
 
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/JasonPekos/Stat744/main/HW2/The_Failed_Bubbleplot_Inlet.png
-" width="350" title="First Attempt at Second Attempt">
-
+  <img src="https://raw.githubusercontent.com/JasonPekos/Stat744/main/HW2/The_Failed_Bubbleplot_Inlet.png" width="350" title="First Attempt at Second Attempt">
 </p>
 
 But I couldn't get the annotations to play nice due to the hacky way I wrote the inset plot. That's why they look very ugly here and don't point to the correct areas. I had other issues coming up with the axis here too, so I had to give up and go a different route.
@@ -81,9 +78,7 @@ I ended up switching to a single bar plot inset to represent the same thing, but
 
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/JasonPekos/Stat744/main/HW2/AsgPlot2.png
-" width="350" title="Second Attempt at Second Attempt">
-
+  <img src="https://raw.githubusercontent.com/JasonPekos/Stat744/main/HW2/AsgPlot2.png" width="350" title="Second Attempt at Second Attempt">
 </p>
 
 This has some advantages over the original two graphs:
