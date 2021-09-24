@@ -78,7 +78,7 @@ I ended up switching to a single bar plot inset to represent the same thing, but
 
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/JasonPekos/Stat744/main/HW2/AsgPlot2.png" width="550" title="Second Attempt at Second Attempt">
+  <img src="https://raw.githubusercontent.com/JasonPekos/Stat744/main/HW2/AsgPlot2.png" width="650" title="Second Attempt at Second Attempt">
 </p>
 
 This has some advantages over the original two graphs:
