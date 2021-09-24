@@ -8,7 +8,7 @@
 
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/JasonPekos/Stat744/main/HW2/you_graph_original.jpg" width="350" title="initial graph from https://www.science.org/news/2017/04/here-s-visual-proof-why-vaccines-do-more-good-harm">
+  <img src="https://raw.githubusercontent.com/JasonPekos/Stat744/main/HW2/you_graph_original.jpg" width="550" title="initial graph from https://www.science.org/news/2017/04/here-s-visual-proof-why-vaccines-do-more-good-harm">
 
 </p>
 
@@ -29,7 +29,7 @@
 For my first graph, I tried simply representing the data as a scatterplot: the Wilke book seems to suggest that this is a pretty good first step with time series data. The main issue is that there is a pretty large amount of noise. This also makes directly connecting all the points pretty unfeasible; the result is really messy, and interferes with interpretation. To compromise, I tried using the built in ggplot LOESS fit to draw a smooth line between the points. 
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/JasonPekos/Stat744/main/HW2/RplotLOESSsimple.png" width="450" title="First Attempt">
+  <img src="https://raw.githubusercontent.com/JasonPekos/Stat744/main/HW2/RplotLOESSsimple.png" width="550" title="First Attempt">
 </p>
 
 This is pretty bad — I think the way that the points after the vaccine drag down the LOESS fit before the vaccine date is misleading: it makes it look like the vaccine had no impact, and really there is some other trend driving this. 
@@ -37,7 +37,7 @@ This is pretty bad — I think the way that the points after the vaccine drag d
 I'd like to fix this, so I replaced the LOESS fit with a regression discontinuity model centred at 1964. 
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/JasonPekos/Stat744/main/HW2/AsgPlot1.png" width="450" title="Second Attempt at First Attempt">
+  <img src="https://raw.githubusercontent.com/JasonPekos/Stat744/main/HW2/AsgPlot1.png" width="550" title="Second Attempt at First Attempt">
 </p>
 
 
@@ -63,7 +63,7 @@ I actually couldn't get what I wanted to do here to work — my initial plan was
 
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/JasonPekos/Stat744/main/HW2/The_Failed_Bubbleplot_Inlet.png" width="450" title="First Attempt at Second Attempt">
+  <img src="https://raw.githubusercontent.com/JasonPekos/Stat744/main/HW2/The_Failed_Bubbleplot_Inlet.png" width="550" title="First Attempt at Second Attempt">
 </p>
 
 But I couldn't get the annotations to play nice due to the hacky way I wrote the inset plot. That's why they look very ugly here and don't point to the correct areas. I had other issues coming up with the axis here too, so I had to give up and go a different route.
@@ -78,7 +78,7 @@ I ended up switching to a single bar plot inset to represent the same thing, but
 
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/JasonPekos/Stat744/main/HW2/AsgPlot2.png" width="450" title="Second Attempt at Second Attempt">
+  <img src="https://raw.githubusercontent.com/JasonPekos/Stat744/main/HW2/AsgPlot2.png" width="550" title="Second Attempt at Second Attempt">
 </p>
 
 This has some advantages over the original two graphs:
