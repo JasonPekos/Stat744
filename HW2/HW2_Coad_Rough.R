@@ -2,6 +2,7 @@ library(tidyverse)
 library(mgcv)
 library(ggplot2)
 library(ggthemes)
+library(wesanderson)
 options(scipen=10000)
 
 
@@ -71,10 +72,10 @@ dummyvec = integer(2)
 cumsumvec = c(tail(cumsum(df_minimal$cases[01:19]),n = 1),
               tail(cumsum(df_minimal$cases[20:70]),n = 1))
 
-cumsumvec = cumsumvec / (sqrt(sum(cumsumvec^2))) #normalize for bubble scale param
-class = c("before", "after")
-df_dummy = tibble(dummyvec, cumsumvec,class)
-
+cumsumvec_normalized = cumsumvec / (sqrt(sum(cumsumvec^2))) #normalize for bubble scale param
+class = c("every case in the ~20 years before the vaccine", "every case in the ~50 years after")
+df_dummy = tibble(dummyvec, cumsumvec_normalized,class)
+df_dummy_full = tibble(dummyvec, cumsumvec,class)
 
 # using help from this answer: 
 #https://stackoverflow.com/a/50876626/12369476
@@ -83,7 +84,7 @@ df_dummy = tibble(dummyvec, cumsumvec,class)
 
 main = ggplot(data = df_minimal, aes( x = year, y = cases)) +
   geom_bar(stat="identity") +
-  ggtitle("Measles Cases Before and After Introduction of Vaccine") +
+  ggtitle("Measles Cases Over Time") +
   annotate(x=bp,y=+Inf,
            label=" < Vaccine Introduced",
            vjust=2,
@@ -98,11 +99,38 @@ rev(df_dummy) #reverse order of columns for opacity reasons
 
 #source for help for making transparent background: 
 #https://stackoverflow.com/a/41878833/12369476
-areaplot = ggplot(data = df_dummy, aes(x = dummyvec, y = dummyvec, size = cumsumvec, color = class)) +
+
+
+
+areaplot = ggplot(data = df_dummy, aes(x = dummyvec, y = dummyvec,
+                                       size = cumsumvec_normalized,
+                                       color = class)) +
     geom_point(alpha = 0.7) +
-    scale_size(range = c(bubblescale * cumsumvec[1],
-                         bubblescale * cumsumvec[2])) +
+    scale_size(range = c(bubblescale * cumsumvec[2],
+                         bubblescale * cumsumvec[1])) +
     theme(legend.position="none") +
+    scale_color_manual(values=c('#999999','#E69F00')) +
+  
+  theme(text = element_text(size = 1)) +
+  
+    annotate(x=0,y=0.0,
+             label="total cases in 18\n  years before vaccine:",
+             vjust=-1.9,
+             hjust = 0.70,
+             #fill = "lightgrey",
+             size = 3,
+             geom="text") +
+  
+   annotate(x=0,y=0,
+             label=" ^ total cases in 52 years\nafter vaccine",
+             vjust= 2.9,
+             hjust = 0.7,
+             #fill = "lightgrey",
+             size = 2.5,
+             geom="text") +
+  
+ 
+  
     theme(axis.title.x=element_blank(),
           axis.text.x=element_blank(),
           axis.ticks.x=element_blank(),
@@ -112,20 +140,36 @@ areaplot = ggplot(data = df_dummy, aes(x = dummyvec, y = dummyvec, size = cumsum
   theme(panel.background = element_rect(fill = "transparent"),
         plot.background = element_rect(fill = "transparent", color = NA),
         panel.grid.major = element_blank(),
-        panel.grid.minor = element_blank())
+        panel.grid.minor = element_blank()) 
 
 
 #not using this anymore — bar plot instead of bubble
+#actually I am using this... 
 areaplot2 = ggplot(data = df_dummy, aes(1, y =  cumsumvec, fill = class)) +
   geom_bar(position = "identity", stat = "identity", alpha = 0.8) +
-  theme_fivethirtyeight()
+  #theme_fivethirtyeight()+
+  theme(panel.background = element_rect(fill = "transparent"),
+        plot.background = element_rect(fill = "lightgrey", color = 'lightgrey'),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank())+
+  theme(axis.title.x=element_blank(),
+        axis.title.y=element_blank(),
+        axis.text.x=element_blank(),
+        axis.ticks.x=element_blank())+
+  theme(legend.position = c(-.14,-.25)) +
+  theme(legend.background=element_rect(fill = '#a5a5a5')) +
+  labs(y = "cases", fill = "Legend") +
+  ggtitle("Cumulative Cases")
 
 #now, add the inlet into the main plot
 library(cowplot)
 fullplot = ggdraw() + draw_plot(main) +
-  draw_plot(areaplot, x = 0.4, y = .23, width = .7, height = .7)
+  draw_plot(areaplot2, x = 0.70, y = .53, width = .2, height = .3) +
+  scale_x_continuous("",breaks=c(.5,2.5),labels=c("Low types","High types") ) 
+
 
 fullplot
+
 
 # main + annotation_custom(
 #   ggplotGrob(main), 
