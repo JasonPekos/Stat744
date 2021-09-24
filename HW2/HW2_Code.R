@@ -1,8 +1,7 @@
 library(tidyverse)
-library(mgcv)
 library(ggplot2)
 library(ggthemes)
-library(wesanderson)
+library(cowplot)
 options(scipen=10000)
 
 
@@ -69,10 +68,14 @@ ggplot(data = df_minimal, aes(x = year, y = cases, color = post_date)) +
 #first, make a new dataframe for our inlet
 
 dummyvec = integer(2)
+
+#just cumulative deaths for 1:19 and 20:70
 cumsumvec = c(tail(cumsum(df_minimal$cases[01:19]),n = 1),
               tail(cumsum(df_minimal$cases[20:70]),n = 1))
 
 cumsumvec_normalized = cumsumvec / (sqrt(sum(cumsumvec^2))) #normalize for bubble scale param
+
+#added a name here to try to get an auto legend thing; I don't think it helps, but I don't want to remove it to break anything
 class = c("every case in the ~20 years before the vaccine", "every case in the ~50 years after")
 df_dummy = tibble(dummyvec, cumsumvec_normalized,class)
 df_dummy_full = tibble(dummyvec, cumsumvec,class)
@@ -82,6 +85,7 @@ df_dummy_full = tibble(dummyvec, cumsumvec,class)
 # and this answer:
 #https://stackoverflow.com/a/52841737/12369476
 
+#THIS IS THE BAR PLOT, creating it first before messing with any inset stuff.
 main = ggplot(data = df_minimal, aes( x = year, y = cases)) +
   geom_bar(stat="identity") +
   ggtitle("Measles Cases Over Time") +
@@ -94,25 +98,37 @@ main = ggplot(data = df_minimal, aes( x = year, y = cases)) +
   geom_vline(xintercept = bp, linetype = "dashed") +
   theme_fivethirtyeight()
 
+
+##BUBBLE PLOT STUFF STARTS HERE
 bubblescale = 70 #makes bubble larger while retaining area
 rev(df_dummy) #reverse order of columns for opacity reasons
 
 #source for help for making transparent background: 
 #https://stackoverflow.com/a/41878833/12369476
 
-
-
 areaplot = ggplot(data = df_dummy, aes(x = dummyvec, y = dummyvec,
                                        size = cumsumvec_normalized,
                                        color = class)) +
     geom_point(alpha = 0.7) +
+    
+    #this scales the actual size of the bubbles in the chart; it should keep the 
+    #values propotional probably
     scale_size(range = c(bubblescale * cumsumvec_normalized[2],
                          bubblescale * cumsumvec_normalized[1])) +
+  
+    #remove legend for now
     theme(legend.position="none") +
+    
+    #add manual bubble colors because green + pink doesn't look great
+    #credit to http://www.sthda.com/english/wiki/ggplot2-colors-how-to-change-colors-automatically-and-manually
+    #here
     scale_color_manual(values=c('#999999','#E69F00')) +
   
-  theme(text = element_text(size = 1)) +
+    #trying to make text smaller, don't think this does much
+    theme(text = element_text(size = 1)) +
   
+    #add actual annotations. This doesn't work probably because I'm technically still using geom_point
+    #which breaks stuff, because all my scales are length 1 dummy variables maybe. 
     annotate(x=0,y=0.0,
              label="total cases in 18\n  years before vaccine:",
              vjust=-1.9,
@@ -121,7 +137,7 @@ areaplot = ggplot(data = df_dummy, aes(x = dummyvec, y = dummyvec,
              size = 3,
              geom="text") +
   
-   annotate(x=0,y=0,
+    annotate(x=0,y=0,
              label=" ^ total cases in 52 years\nafter vaccine",
              vjust= 2.9,
              hjust = 0.7,
@@ -130,54 +146,52 @@ areaplot = ggplot(data = df_dummy, aes(x = dummyvec, y = dummyvec,
              geom="text") +
   
  
-  
+    #strip all the formatting because this is a inset. Need to make custom stuff later.
     theme(axis.title.x=element_blank(),
           axis.text.x=element_blank(),
           axis.ticks.x=element_blank(),
           axis.title.y=element_blank(),
           axis.text.y=element_blank(),
           axis.ticks.y=element_blank())+
-  theme(panel.background = element_rect(fill = "transparent"),
-        plot.background = element_rect(fill = "transparent", color = NA),
-        panel.grid.major = element_blank(),
-        panel.grid.minor = element_blank()) 
+    theme(panel.background = element_rect(fill = "transparent"),
+          plot.background = element_rect(fill = "transparent", color = NA),
+           panel.grid.major = element_blank(),
+          panel.grid.minor = element_blank()) 
 
 
 #not using this anymore — bar plot instead of bubble
 #actually I am using this... 
 areaplot2 = ggplot(data = df_dummy, aes(1, y =  cumsumvec, fill = class)) +
-  geom_bar(position = "identity", stat = "identity", alpha = 0.8) +
-  #theme_fivethirtyeight()+
+  #make one-bar bar chart
+  geom_bar(position = "identity", stat = "identity", alpha = 0.8) + 
+  
+  #mess with colors and remove some elements because this is an inset
   theme(panel.background = element_rect(fill = "transparent"),
         plot.background = element_rect(fill = "lightgrey", color = 'lightgrey'),
         panel.grid.major = element_blank(),
         panel.grid.minor = element_blank())+
+  
+  #remove some elements because this is an inset. 
   theme(axis.title.x=element_blank(),
         axis.title.y=element_blank(),
         axis.text.x=element_blank(),
         axis.ticks.x=element_blank())+
+  
+  #move legend around 
   theme(legend.position = c(-.14,-.25)) +
+  
+  #fill legend with not-pure-white
   theme(legend.background=element_rect(fill = '#a5a5a5')) +
+  
+  #labels and title
   labs(y = "cases", fill = "Legend") +
   ggtitle("Cumulative Cases")
 
 #now, add the inlet into the main plot
-library(cowplot)
 fullplot = ggdraw() + draw_plot(main) +
-  #draw_plot(areaplot, x = 0.4, y = .23, width = .7, height = .7)+
-  draw_plot(areaplot2, x = 0.70, y = .53, width = .2, height = .3) +
+  #draw_plot(areaplot, x = 0.4, y = .23, width = .7, height = .7)+ #uncomment for bubble
+  draw_plot(areaplot2, x = 0.70, y = .53, width = .2, height = .3) + #comment for bubble
   scale_x_continuous("",breaks=c(.5,2.5),labels=c("Low types","High types") ) 
 
 
 fullplot
-
-
-
-
-# main + annotation_custom(
-#   ggplotGrob(main), 
-#   xmin = 5, xmax = 7, ymin = 30, ymax = 44
-# )
-
-
-
