@@ -104,4 +104,4 @@ Ultimately, I think the way to go is probably a combination of the two: remove t
 
 **BMB: I agree that this could be nice. The circle/bubble is visually attractive even if it's lower on the Cleveland hierarchy than a stacked bar chart. I might (1) suppress spaces between bars; (2) fill bars with different colours before/after onset of vax (these could match colours in the inset);  maybe change aspect ratio?**
 
-**BMB: mark 2.5/3**
+**BMB: mark 2.6/3**
