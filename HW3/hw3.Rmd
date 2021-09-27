@@ -1,0 +1,49 @@
+---
+title: "hw3"
+author: "Jason Pekos"
+date: "27/09/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+```
+
+## Write up table
+
+
+
+```{r}
+Diseases = c("H3N2","H1N1","B","Cold", "Total")
+
+DeathsNY    = c(1492,  -88,  774,   1640, 3819)
+CINY_left   = c(361 , -569,  -21,  -1815,   66)
+CINY_right  = c(2624,  384,  1571,  5097, 7572)
+
+
+DeathsII    = c(2126,   127,  549,  1646, 4447)
+CIII_left   = c(1004,  -338, -173, -2504,   62)
+CIII_right  = c(3249,   592, 1271,  5796, 8832)
+
+
+tibble(Diseases,
+       DeathsNY,
+       CINY_left,
+       CINY_right,
+       DeathsII,
+       CIII_left,
+       CIII_right)
+
+
+
+```
+
+
+
+## Plots
+
+```{r pressure, echo=FALSE}
+
+```
+
