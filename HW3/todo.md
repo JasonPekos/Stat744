@@ -12,7 +12,7 @@ ASG:
 
 mon evening 
 
-- [] write up chart info from the DUSHOFF paper (go to pdf)
+- [x] write up chart info from the DUSHOFF paper (go to pdf)
 
 - [] quick eda 
 
