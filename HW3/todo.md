@@ -14,18 +14,18 @@ mon evening
 
 - [x] write up chart info from the DUSHOFF paper (go to pdf)
 
-- [] quick eda 
+- [ ] quick eda 
 
-- [] actual graph (time permitting)
+- [ ] actual graph (time permitting)
 
-- [] writeup (time permitting)
+- [ ] writeup (time permitting)
 
 --
 
 tue evening 
 
-- [] actual graph
+- [ ] actual graph
 
-- [] finish writeup
+- [ ] finish writeup
 
-- [] push finished version :D
+- [ ] push finished version :D
