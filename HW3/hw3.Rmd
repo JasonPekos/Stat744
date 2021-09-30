@@ -27,23 +27,48 @@ CIII_left   = c(1004,  -338, -173, -2504,   62)
 CIII_right  = c(3249,   592, 1271,  5796, 8832)
 
 
-tibble(Diseases,
-       DeathsNY,
-       CINY_left,
-       CINY_right,
-       DeathsII,
-       CIII_left,
-       CIII_right)
+df = tibble(Diseases,
+            DeathsNY,
+           CINY_left,
+          CINY_right,
+            DeathsII,
+           CIII_left,
+           CIII_right)
+```
 
+
+
+## Exploratory Plots
+
+```{r}
+ggplot(data = df, aes = (x = Diseases, y = DeathsNY ))
+```
+
+
+## Actual Plot One
+
+```{r}
 
 
 ```
 
 
 
-## Plots
+## Actual Plot Two
 
-```{r pressure, echo=FALSE}
+```{r}
 
 ```
+
+
+
+
+
+
+
+
+
+
+
+
 
