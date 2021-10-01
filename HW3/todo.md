@@ -14,9 +14,9 @@ mon evening
 
 - [x] write up chart info from the DUSHOFF paper (go to pdf)
 
-- [ ] quick eda 
+- [x] quick eda 
 
-- [ ] actual graph (time permitting)
+- [x ] actual graph (time permitting)
 
 - [ ] writeup (time permitting)
 
@@ -24,8 +24,10 @@ mon evening
 
 tue evening 
 
-- [ ] actual graph
+- [x] actual graph
 
 - [ ] finish writeup
 
 - [ ] push finished version :D
+
+CHECK END OF PLOT SCRIPT FOR UP TO DATE TODO!!

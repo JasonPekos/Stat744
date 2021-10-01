@@ -2,73 +2,166 @@
 title: "hw3"
 author: "Jason Pekos"
 date: "27/09/2021"
-output: html_document
+output:
+  pdf_document: default
+  html_document: default
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 library(tidyverse)
+library(grid)
+library(gridExtra)
+library(ggthemes)
 ```
 
-## Write up table
 
-
-
-```{r}
+```{r, echo = FALSE}
 Diseases = c("H3N2","H1N1","B","Cold", "Total")
 
 DeathsNY    = c(1492,  -88,  774,   1640, 3819)
 CINY_left   = c(361 , -569,  -21,  -1815,   66)
 CINY_right  = c(2624,  384,  1571,  5097, 7572)
+CI_dev_NY = abs(DeathsNY - CINY_right)
+cityNY = "New York Metropolitan Area"
 
 
 DeathsII    = c(2126,   127,  549,  1646, 4447)
 CIII_left   = c(1004,  -338, -173, -2504,   62)
 CIII_right  = c(3249,   592, 1271,  5796, 8832)
+CI_dev_II = abs(DeathsII - CIII_right)
+cityII = "Illinois and Indiana"
 
 
-df = tibble(Diseases,
-            DeathsNY,
-           CINY_left,
-          CINY_right,
-            DeathsII,
-           CIII_left,
-           CIII_right)
+
+dfNY = tibble(Diseases,
+              DeathsNY,
+              CINY_left,
+              CINY_right,
+              cityNY,
+              CI_dev_NY)
+          
+dfII = tibble(Diseases,
+              DeathsII,
+              CIII_left,
+              CIII_right,
+              cityII,
+              CI_dev_II)
 ```
 
 
 
-## Exploratory Plots
+## Plots
 
-```{r}
-ggplot(data = df, aes = (x = Diseases, y = DeathsNY ))
+For the first plot, I'll just do a standard CI-type plot for each region separately. I think this keeps clutter to a minimum, and emphasizes the subcategories in the original table. There are some other options here that I decided against:
+
+\begin{itemize}
+  \item Bar plots
+  \item Connecting the points with \verb|geom_line()|
+\end{itemize}
+
+I didn't like bar plots here because I feel that just using \verb|geom_point()| emphasizes that this is a point estimate from a regression, and I feel that the bars add unnecessary clutter to the error bars. Also the presence of negative point estimates here doesn't look great on a bar plot (in my opinion).
+
+I decided not to use \verb|geom_line()| because I feel it helps with absolutely nothing, even though I saw it used online a lot for this type of task. If there was some change over time, I would probably consider a super light version of it (thin mid-opacity dashed lines), but that isn't a part of this table. 
+
+I made a few other minor additions --- most importantly, more breaks to help with interpretability. \
+
+Overall though, there's only a few pieces of information we actually care about encoding here:
+
+\begin{itemize}
+  \item Geographic area studied
+  \item Point estimate of Deaths
+  \item Disease name
+  \item Error estimates
+\end{itemize}
+
+We deal with the first by simply making two plots. We encode the second with position on a common scale, and we add the error estimates --- which are in the same units --- to the same scale. The only thing I'm unsure about is (not) encoding disease name with colour. I didn't end up doing this because it's already 'encoded' in some sense by position on the x-axis. It's a very simple table, and there isn't an interpretability issue with a graph like this. Especially with only five categories, I feel this would add needless clutter to a nice and simple graph.
+
+```{r, echo = 0}
+title = "Estimated Deaths in"
+
+HW3Plotter = function(df){
+  ggplot(df, aes (x = Diseases, y = pull(df, 2))) + 
+    geom_point() +
+    geom_errorbar(aes(ymin = pull(df, 2) - pull(df, -1),
+                      ymax = pull(df, 2) + pull(df, -1)),
+                  width  = 0.4)  +
+    theme_hc() +
+    scale_y_continuous(n.breaks = 8, limits  = c(-3000,10000)) +
+
+    ggtitle(paste(title, pull(df, -2))) +
+    xlab("Cause of Death")    +
+    ylab("Deaths with 95% CI")    
+}
+
+HW3Plotter(dfNY)
+cat("\\newpage")
+HW3Plotter(dfII)
 ```
 
 
-## Actual Plot One
 
-```{r}
 
+## Alternate Graph:
+
+Simply seperating out the categories seems a little like cheating, so an alternate graph where we plot the same disease for both cities on the same graph, but spliting out each disease --- we do this because the wide range of estimates across diseases and the tiny variation within diseases makes differentiation super tough. 
+
+```{r, echo = 0}
+####CREATE NEW DFS FOR EASY PLOTTING 
+#Probably what I should have done from the start
+dfNY %>% rename(Deaths = DeathsNY,CI_left = CINY_left, CI_right = CINY_right, City = cityNY, CI_Dev = CI_dev_NY) -> dfNY2
+dfII %>% rename(Deaths = DeathsII,CI_left = CIII_left, CI_right = CIII_right, City = cityII, CI_Dev = CI_dev_II) -> dfII2
+
+dfFULL = rbind(dfNY2, dfII2)
+```
+
+```{r, echo = 0}
+plots  = list()
+#searching for something totally seperate, once I commited to this path already, I found this question
+#https://stackoverflow.com/questions/9315611/grid-of-multiple-ggplot2-plots-which-have-been-made-in-a-for-loop
+#which made my life here a lot easier. credit to this person (Justin).
+
+for (Sick in unique(pull(dfFULL,1))) {
+  plots[[Sick]] = ggplot(data = filter(dfFULL,  Diseases == Sick), aes(x = 0, y = Deaths, color = City)) +
+              geom_errorbar(aes(ymin = Deaths - CI_Dev, ymax = Deaths + CI_Dev ),
+                              position=position_dodge(0.05),
+                            width = 0.3,
+                            show.legend = FALSE) +
+              geom_point(position=position_dodge(0.05),
+                         show.legend = FALSE) +
+    theme(aspect.ratio=18/9) +
+    xlim(-1,1) +
+    labs(x = Sick) + 
+    theme(
+        axis.text.x=element_blank(),
+        axis.ticks.x=element_blank(),
+        axis.title.y=element_blank()
+        )
+
+  
+}
+
+#more help 
+#https://stackoverflow.com/a/49767811
+#from user MBORG 
+
+#also 
+#https://stackoverflow.com/a/25962717
+#user BAPTISTE 
+
+#common legend
+#https://stackoverflow.com/a/13650878
+#credit to ROLAND 
+
+main = do.call(grid.arrange,c(plots, top = "Estimated Deaths by Disease and Region", ncol = 5))
 
 ```
 
+EXPLAIN POINT OF GRAPHS WHAT AM I TRYING TO SHOW BEFORE FRIDAY NIGHT
 
+ALSO COMMENT CODE
 
-## Actual Plot Two
+LOOK HERE ALSO:
 
-```{r}
-
-```
-
-
-
-
-
-
-
-
-
-
-
-
+https://stackoverflow.com/a/49834950
 
