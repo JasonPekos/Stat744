@@ -77,7 +77,7 @@ Overall though, there's only a few pieces of information we actually care about 
 
 We deal with the first by simply making two plots. We encode the second with position on a common scale, and we add the error estimates --- which are in the same units --- to the same scale. The only thing I'm unsure about is (not) encoding disease name with colour. I didn't end up doing this because it's already 'encoded' in some sense by position on the x-axis. It's a very simple table, and there isn't an interpretability issue with a graph like this. Especially with only five categories, I feel this would add needless clutter to a nice and simple graph.
 
-```{r, echo = 0}
+```{r, echo = 0, results='hide',fig.keep='all', fig.width=6}
 title = "Estimated Deaths in"
 
 HW3Plotter = function(df){
@@ -95,7 +95,11 @@ HW3Plotter = function(df){
 }
 
 HW3Plotter(dfNY)
-cat("\\newpage")
+```
+
+\vspace{0.05cm}
+
+```{r, echo = 0, results='hide',fig.keep='all', fig.width=6}
 HW3Plotter(dfII)
 ```
 
@@ -104,7 +108,9 @@ HW3Plotter(dfII)
 
 ## Alternate Graph:
 
-Simply seperating out the categories seems a little like cheating, so an alternate graph where we plot the same disease for both cities on the same graph, but spliting out each disease --- we do this because the wide range of estimates across diseases and the tiny variation within diseases makes differentiation super tough. 
+Simply separating out the categories seems a little like cheating, so an alternate graph where we plot the same disease for both cities on the same graph, but splitting out each disease --- we do this because the wide range of estimates across diseases and the tiny variation within diseases makes differentiation geographically super tough. \
+
+
 
 ```{r, echo = 0}
 ####CREATE NEW DFS FOR EASY PLOTTING 
@@ -115,30 +121,39 @@ dfII %>% rename(Deaths = DeathsII,CI_left = CIII_left, CI_right = CIII_right, Ci
 dfFULL = rbind(dfNY2, dfII2)
 ```
 
-```{r, echo = 0}
+
+## Graph of estimated deaths + 95% CIs for each respiratory illness:
+
+```{r, echo = 0, results='hide',fig.keep='all'}
 plots  = list()
+
+library(ggpubr)
+
 #searching for something totally seperate, once I commited to this path already, I found this question
 #https://stackoverflow.com/questions/9315611/grid-of-multiple-ggplot2-plots-which-have-been-made-in-a-for-loop
 #which made my life here a lot easier. credit to this person (Justin).
 
-for (Sick in unique(pull(dfFULL,1))) {
-  plots[[Sick]] = ggplot(data = filter(dfFULL,  Diseases == Sick), aes(x = 0, y = Deaths, color = City)) +
-              geom_errorbar(aes(ymin = Deaths - CI_Dev, ymax = Deaths + CI_Dev ),
-                              position=position_dodge(0.05),
-                            width = 0.3,
-                            show.legend = FALSE) +
-              geom_point(position=position_dodge(0.05),
-                         show.legend = FALSE) +
-    theme(aspect.ratio=18/9) +
-    xlim(-1,1) +
-    labs(x = Sick) + 
-    theme(
-        axis.text.x=element_blank(),
-        axis.ticks.x=element_blank(),
-        axis.title.y=element_blank()
-        )
+for (Disease in unique(pull(dfFULL,1))) {
+  plots[[Disease]] = ggplot(data = filter(dfFULL,  Diseases == Disease), aes(x = 0, y = Deaths, color = City)) +
+    
+                            geom_errorbar(aes(ymin = Deaths - CI_Dev, ymax = Deaths + CI_Dev ),
+                                              position = position_dodge(0.05),
+                                              width = 0.3,
+                                              show.legend = TRUE) +
+    
+                            geom_point(position=position_dodge(0.05),
+                                       show.legend = TRUE) +
+    
+                            theme(aspect.ratio=6/3) +
+                            xlim(-1,1) +
+                            labs(x = Disease) + 
+                            theme(
+                                   axis.text.x=element_blank(),
+                                   axis.ticks.x=element_blank(),
+                                   axis.title.y=element_blank()
+                                  )
+                          
 
-  
 }
 
 #more help 
@@ -153,15 +168,33 @@ for (Sick in unique(pull(dfFULL,1))) {
 #https://stackoverflow.com/a/13650878
 #credit to ROLAND 
 
-main = do.call(grid.arrange,c(plots, top = "Estimated Deaths by Disease and Region", ncol = 5))
 
+
+#credit to https://community.rstudio.com/t/adding-main-title-using-ggarrange/85629
+#user: nirgrahamuk
+
+text <- "example title" 
+# Create a text grob 
+tgrob <- text_grob(text,size = 20) 
+plot_0 <- as_ggplot(tgrob) + theme(plot.margin = margin(0,3,0,0, "cm")) 
+#ggarrange(plot_0,NULL,plot_1, plot_2, ncol = 2,nrow = 2,heights = c(1,5))
+titleVector = list( NULL, plot_0, NULL, NULL, NULL)
+nullVec = list(NULL)
+#didn't end up using the title because it just simply can't work ...
+
+#plots = append(titleVector, plots)
+plots = append(plots, nullVec)
+
+main = do.call(ggarrange, c(plot_list = plots, ncol = 5, nrows = 2, common.legend = TRUE, legend="bottom"))
+main
 ```
 
-EXPLAIN POINT OF GRAPHS WHAT AM I TRYING TO SHOW BEFORE FRIDAY NIGHT
 
-ALSO COMMENT CODE
+\section{Purpose and Discussion}
 
-LOOK HERE ALSO:
 
-https://stackoverflow.com/a/49834950
+The purpose of these graphs is to show the point estimates + 95% error bars from a regression model intended to measure seasonal respiratory virus mortality. \
 
+I've already talked about the considerations for graph one. In graph two, we now encode geographic location by color, split the illness classifications into different sub-graphs, and encode deaths via position on a common scale. The purpose of this graph is to compare deaths due to the same disease in different municipalities --- I'd argue that the most important metric here is still deaths, and that even though we encode location primarily by colour, we also implicitly encode it into position by keeping one point estimate from each location in each box. This makes it easier to compare the metric we care about (deaths) --- keeping the points of interest next to each other.  \
+
+This respects Cleveland's hierarchy for the most part, and I find the graph very readable. 
