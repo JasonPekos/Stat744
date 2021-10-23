@@ -53,6 +53,10 @@ Model output, drawn as 50 pulls from the posterior distribution for each compart
 
 
 
+<img src="https://raw.githubusercontent.com/JasonPekos/Stat744/07d3c1646480536f6e1636417009532f63d00cf2/HW4/plot_92.svg
+">
+
+
 
 
 
