@@ -1,11 +1,11 @@
 using MCMCChains, StatsPlots, Turing, Distributions, DifferentialEquations, Random, CSV, DataFrames
 
-#= 
+#=
 
-this fits a  model to the deaths time series from Eyam. Taken from the Louse 
-plague project. 
+this fits a  model to the deaths time series from Eyam. Taken from the Louse
+plague project.
 
-This is the same code as from the RMD, but much nicer to look at. 
+This is the same code as from the RMD, but much nicer to look at.
 
 =#
 
@@ -22,17 +22,17 @@ dat = cumsum([3,4,1,3,1,3,1,1,0,0,1,0,1,1,2,0,1,2,0,1,2,
 
 #=
 here we define our model — using simple SID so that
-I don't break things too much. 
+I don't break things too much.
 =#
 
 N = 347
  #I made this number up, because cumsum(deaths) in the time series
- #Yields 500k Dead 
+ #Yields 500k Dead
 
 
 function SID(du, u, p, t)
-    s,i,d,r = u 
-    β, γ, μ  = p  
+    s,i,d,r = u
+    β, γ, μ  = p
 
     du[1] = -(β/N)*s*i
     du[2] = (β/N)*s*i - γ*i - μ*i
@@ -40,7 +40,7 @@ function SID(du, u, p, t)
     du[4] = μ*i
 end;
 
-#These are NOT priors, though the 
+#These are NOT priors, though the
 #ICs persist into the problem
 #they exist so I can remake
 #which is better if I want to run some tests
@@ -53,9 +53,9 @@ u0 = [N,1,0.0]
 prob = ODEProblem(SID, u0, (0.0, length(dat) - 1) , p)
 
 #regardless of the interval you solve on, return values only once a day
-retEvery = 1.0 
+retEvery = 1.0
 
-#Tsit5 is the recommended solver unless you have a weird really stiff 
+#Tsit5 is the recommended solver unless you have a weird really stiff
 #problem or something
 sol = solve(prob, Tsit5(), saveat=retEvery)
 
@@ -98,5 +98,5 @@ pl
 @gif for i = 1:samples
     scatter(diff(dat))
     plot!(diff(solve(remake(prob,p=chain_array[rand(1:4000), 2:3]),Tsit5(),saveat=1)[3,:]))
-    
+
 end every 10

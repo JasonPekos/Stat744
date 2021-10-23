@@ -1,11 +1,17 @@
 using MCMCChains, StatsPlots, Turing, Distributions, DifferentialEquations, Random, CSV, DataFrames
 
-#= 
+## BMB: I get lots of warnings about Method definitions being overwritten by StatsFuns ->
+## "** incremental compilation may be fatally broken for this module **"
 
-this fits a  model to the deaths time series from Eyam. Taken from the Louse 
-plague project. 
+#=
 
-This is the same code as from the RMD, but much nicer to look at. 
+this fits a  model to the deaths time series from Eyam. Taken from the Louse
+plague project.
+
+This is the same code as from the RMD, but much nicer to look at.
+
+## BMB: what's the difference between Eyam.jl and EyamSIRD.jl ???o
+
 
 =#
 
@@ -20,18 +26,22 @@ dat = cumsum([3,4,1,3,1,3,1,1,0,0,1,0,1,1,2,0,1,2,0,1,2,
               0,0,0,0,1,0,1,1,0,1,1,2,0,2,0,0,1,1,2,1,1,
               0,2,1,0,0,0,0,0,0,0,0,0,1,0,0,0,1]);
 
+## BMB: you should probably read a data file instead of hard-coding the data.
+## Why are you fitting to cumsum ... ???? Usually a bad idea (induces correlation
+## in originally independent observations)
+
 #=
 here we define our model — using simple SID so that
-I don't break things too much. 
+I don't break things too much.
 =#
 
 N = 347
  #I made this number up, because cumsum(deaths) in the time series
- #Yields 500k Dead 
-
+#Yields 500k Dead
+## BMB: not sure what this means ????
 
 function SID(du, u, p, t)
-    s,i,d = u 
+    s,i,d = u
     β, γ = p
 
     du[1] = -(β/N)*s*i
@@ -39,7 +49,7 @@ function SID(du, u, p, t)
     du[3] = γ*i
 end;
 
-#These are NOT priors, though the 
+#These are NOT priors, though the
 #ICs persist into the problem
 #they exist so I can remake
 #which is better if I want to run some tests
@@ -52,12 +62,11 @@ u0 = [N,1,0.0]
 prob = ODEProblem(SID, u0, (0.0, length(dat) - 1) , p)
 
 #regardless of the interval you solve on, return values only once a day
-retEvery = 1.0 
+retEvery = 1.0
 
-#Tsit5 is the recommended solver unless you have a weird really stiff 
+#Tsit5 is the recommended solver unless you have a weird really stiff
 #problem or something
 sol = solve(prob, Tsit5(), saveat=retEvery)
-
 
 @model function fitSID(data, prob)
 
