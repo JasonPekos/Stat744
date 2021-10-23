@@ -69,4 +69,9 @@ I will fix this later --- if you're marking it now, don't judge it too much plea
 
 
 
+<img src="https://raw.githubusercontent.com/JasonPekos/Stat744/main/HW4/plot_113.gif">
+
+
+
+
 
