@@ -198,3 +198,11 @@ The purpose of these graphs is to show the point estimates + 95% error bars from
 I've already talked about the considerations for graph one. In graph two, we now encode geographic location by color, split the illness classifications into different sub-graphs, and encode deaths via position on a common scale. The purpose of this graph is to compare deaths due to the same disease in different municipalities --- I'd argue that the most important metric here is still deaths, and that even though we encode location primarily by colour, we also implicitly encode it into position by keeping one point estimate from each location in each box. This makes it easier to compare the metric we care about (deaths) --- keeping the points of interest next to each other.  \
 
 This respects Cleveland's hierarchy for the most part, and I find the graph very readable. 
+
+### JD
+
+Straightforward but reasonable. I would say it's important to tag the graphs as "excess" deaths -- negative "deaths" are not a thing.
+
+The regional graphs are noticeably uglier. Part of the reason is the different background, but there is also a lack of space between the points. Did you try any "dodge" options? I feel like with some work you could put all of these onto one reasonably nice graph.
+
+Grade: 2/3
