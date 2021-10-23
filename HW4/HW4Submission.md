@@ -48,7 +48,7 @@ There is no good reason for these picks, but I don't think they're that awful.
 
 ## plots
 
-Model output, drawn as 50 pulls from the posterior distribution for each compartment. Deaths are in red, and are differenced to match the time series. 
+Model output, drawn as 50 pulls from the posterior distribution for each compartment. Deaths are in red, and are differenced to match the time series. Current infections are in teal. 
 
 
 
