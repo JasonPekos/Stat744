@@ -58,6 +58,15 @@ Model output, drawn as 50 pulls from the posterior distribution for each compart
 
 
 
+Streaming in points and watching as the model calibrates:
+
+
+
+
+This graph is messed up in a bunch of ways. It also takes like two hours to plot, because I sample 50x NUTS runs at every step and then plot 50x graphs, for ~125 steps. 
+
+I will fix this later --- if you're marking it now, don't judge it too much please :(
+
 
 
 
