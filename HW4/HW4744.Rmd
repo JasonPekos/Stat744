@@ -63,7 +63,7 @@ We have priors:
 
 \[   
 \begin{aligned}
-  &\sigma \sim- \text { Inv-Gamma }(3,1)\\
+  &\sigma \sim \text { Inv-Gamma }(3,1)\\
   &\beta \sim \mathcal{N}(0.9, 4)\\
   &\gamma \sim \mathcal{N}(0.4, 4)\\
   &\mu \sim \mathcal{N}(0.4, 4)
