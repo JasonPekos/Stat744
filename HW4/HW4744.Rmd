@@ -47,10 +47,11 @@ Eyam = tibble(day, deaths)
 ggplot(data = Eyam, aes(x = day, y = deaths))+
   geom_point() +
   ggtitle("Deaths per Day in Eyam, 1665") +
-  theme_stata() +
+  theme_fivethirtyeight() +
   geom_smooth(span = 0.4, aes(colour ="LOESS fit")) +
   scale_color_hue(labels = c("LOESS Smooth")) +
-  labs("color" = "Legend")
+  labs("color" = "Legend") +
+  geom_hline(yintercept=0, linetype="dashed", color = "black")
   
    
 ```
@@ -69,7 +70,8 @@ We have priors:
 \end{aligned}
 \]
 
-with every normal distribution truncated at zero and ten.\
+
+with every normal distribution truncated at zero and ten, and $\sigma$ as the expected noise in our data.\
 
 We want to make the following inferences --- first, we want to recover and view the posterior densities associated with our SIRD parameters. Second, we want to estimate the values for our other compartments, as we fit the model only to deaths.  \
 
@@ -92,8 +94,22 @@ pl_areas = mcmc_areas(chains,
            point_est = "mean")
 
 pl_areas +
-  ggtitle("Estimated Posterior Distributions around Model Parameters") +
-  theme_stata()
+  ggtitle("Estimated Posterior Distributions") +
+  theme_fivethirtyeight()
+  
+```
+
+
+Above we only plotted two parameters, because the scope of the other parameters makes the graph illegible if they are plotted together.\
+
+We can plot every posterior distribution seperately also:
+
+```{r, echo=FALSE, results='hide',  message=FALSE, warning=FALSE}
+
+lft = mcmc_dens(chains, pars = c("beta", "gamma", "mu", "sigma")) + 
+  ggtitle("Estimated Posterior Distributions for SIRD model") 
+
+lft  
 ```
 
 
@@ -134,7 +150,7 @@ ggplot(mdatDeath, aes(x = time,y =value)) +
   geom_line(size=0.2, alpha=0.1, aes(group =  trial, color="blue")) +
   geom_point(data =  Eyam, aes(x = day, y = deaths)) +
   geom_line(data = mdatInf, size=0.2, alpha=0.1, aes(group =  trial, color = "red"))+
-  theme_stata() + 
+  theme_fivethirtyeight() + 
   ggtitle("Deaths per Day in Eyam With Posterior Draws, 1665")   +
   scale_color_manual(labels = c("Deaths (red)", "Infected (blue)"), values = c("red", "blue")) +
   labs(color = "Legend")
