@@ -1,0 +1,146 @@
+---
+title: "Homework 4"
+output:
+  pdf_document: default
+  html_notebook: default
+---
+
+This asg. asks:
+
+>  Fit a model to real data, or find a table of model results, and [plot?] one or two plots illustrating a statistical inference. Let us know if you need help finding a data set, or a plausible scientific question to attack with a model.
+
+
+\section{Model}
+
+This asg fits an SIRD model to the Eyam plague using NUTS in Turing.jl. Code for the actual model can be found in the EyamSIRD.jl file attached.\
+
+The model is 
+
+\[ 
+\begin{aligned}
+&\frac{d S}{d t}=-\frac{\beta I S}{N} \\
+&\frac{d I}{d t}=\frac{\beta I S}{N}-\gamma I-\mu I \\
+&\frac{d R}{d t}=\gamma I \\
+&\frac{d D}{d t}=\mu I
+\end{aligned}
+\]
+
+The initial data from the plague is as follows: we have a time series of deaths recorded by the church in Eyam around the time of the great plague:
+
+```{r, echo=FALSE, results='hide',  message=FALSE, warning=FALSE}
+
+library(tidyverse)
+library(ggthemes)
+
+library(JuliaCall)
+#deaths in eyam
+deaths = c(3,4,1,3,1,3,1,1,0,0,1,0,1,1,2,0,1,2,0,1,2,
+              1,1,4,2,2,1,2,0,1,0,1,1,2,3,6,1,0,0,0,3,0,
+              1,3,4,0,1,3,5,4,2,6,6,3,0,3,4,1,1,2,1,2,8,
+              3,5,1,3,4,2,4,2,1,1,1,3,0,2,1,0,3,0,2,1,1,
+              2,0,0,2,1,3,1,0,0,2,0,0,0,0,1,0,1,1,1,3,0,
+              0,0,0,0,1,0,1,1,0,1,1,2,0,2,0,0,1,1,2,1,1,
+              0,2,1,0,0,0,0,0,0,0,0,0,1,0,0,0,1);
+
+day = c(1:length(deaths))
+Eyam = tibble(day, deaths)
+ggplot(data = Eyam, aes(x = day, y = deaths))+
+  geom_point() +
+  ggtitle("Deaths per Day in Eyam, 1665") +
+  theme_stata() +
+  geom_smooth(span = 0.4, aes(colour ="LOESS fit")) +
+  scale_color_hue(labels = c("LOESS Smooth")) +
+  labs("color" = "Legend")
+  
+   
+```
+
+
+We want to make the following inferences --- first, we want to recover and view the posterior densities associated with our SIRD parameters. Second, we want to estimate the values for our other compartments, as we fit the model only to deaths.  \
+
+
+To start, we read in our model output from Julia, and plot the posterior distribution of the $\mu$ (mortality) and $\beta$ (rate of infection) parameters.
+
+The shaded area represents the 80% CI, with the point estimate at the posterior mean. 
+
+
+```{r, echo=FALSE, results='hide',  message=FALSE, warning=FALSE}
+chains = tibble(read.csv("ModelOut.csv"))
+chains = rename(chains, sigma = σ, beta = β, gamma = γ, mu = μ) #dumb, from julia code
+
+library(bayesplot)
+
+pl_areas = mcmc_areas(chains,
+           pars = c("beta", "mu"),
+           prob = 0.80,
+           prob_outer = 1,
+           point_est = "mean")
+
+pl_areas +
+  ggtitle("Estimated Posterior Distributions around Model Parameters") +
+  theme_stata()
+```
+
+
+
+Now for the visualization of the different compartments:
+
+```{r, echo=FALSE, results='hide',  message=FALSE, warning=FALSE}
+library(reshape2)
+
+#model simulations done in julia
+draws = read.csv("ModelDraws.csv")
+
+
+
+#help from: https://stackoverflow.com/questions/27826666/plotting-1000-lines-with-ggplot2
+
+deaths  = read.csv("ModelDrawsDead.csv")
+infected  = read.csv("ModelDrawsInfected.csv")
+
+rownames(deaths) = paste("trial", seq(200), sep="")
+colnames(deaths) = paste("time", seq(142), sep="")
+
+rownames(infected) = paste("trial", seq(201), sep="")
+colnames(infected) = paste("time", seq(143), sep="")
+
+dat = as.data.frame(infected)
+infected = dat
+deaths  =  as.data.frame(deaths)
+deaths$trial = rownames(deaths)
+infected$trial = rownames(infected)
+
+mdatInf = melt(infected, id.vars="trial")
+mdatDeath = melt(deaths, id.vars="trial")
+mdatInf$time = as.numeric(gsub("time", "", mdatInf$variable))
+mdatDeath$time = as.numeric(gsub("time", "", mdatDeath$variable))
+
+
+ggplot(mdatDeath, aes(x = time,y =value)) +
+  geom_line(size=0.2, alpha=0.1, aes(group =  trial, color="blue")) +
+  geom_point(data =  Eyam, aes(x = day, y = deaths)) +
+  geom_line(data = mdatInf, size=0.2, alpha=0.1, aes(group =  trial, color = "red"))+
+  theme_stata() + 
+  ggtitle("Deaths per Day in Eyam With Posterior Draws, 1665")   +
+  scale_color_manual(labels = c("Deaths (red)", "Infected (blue)"), values = c("red", "blue")) +
+  labs(color = "Legend")
+
+  
+```
+
+
+Notice how the infered infection category for which we lack any data has a larger range of uncertainty in the distribution of possible fits compared to the deaths time series for which we have data. 
+
+
+
+
+
+
+
+
+
+
+
+
+
+

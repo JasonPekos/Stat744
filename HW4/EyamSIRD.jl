@@ -31,7 +31,7 @@ N = 347
 
 
 function SID(du, u, p, t)
-    s,i,d,r = u
+    s,i,r,d = u
     β, γ, μ  = p
 
     du[1] = -(β/N)*s*i
@@ -40,14 +40,12 @@ function SID(du, u, p, t)
     du[4] = μ*i
 end;
 
-#These are NOT priors, though the
-#ICs persist into the problem
-#they exist so I can remake
-#which is better if I want to run some tests
+#ICs so I can remake
 β = 0.08
 γ = 0.01
-p = [β,γ]
-u0 = [N,1,0.0]
+μ = 0.01
+p = [β,γ, μ]
+u0 = [N,1,0.0,0.0]
 
 #setup and solve problem
 prob = ODEProblem(SID, u0, (0.0, length(dat) - 1) , p)
@@ -66,20 +64,21 @@ sol = solve(prob, Tsit5(), saveat=retEvery)
     σ ~ InverseGamma(3,1)
     β ~ Truncated(Normal(0.9, 4), 0, 10)
     γ ~ Truncated(Normal(0.4, 4), 0, 10)
+    μ ~ Truncated(Normal(0.4, 4), 0, 10)
 
-    p = [β , γ]
+    p = [β, γ, μ]
 
     probNew = remake(prob, p=p)
     predicted = solve(probNew, Tsit5(), saveat = retEvery)
 
     for i in 1: length(predicted) - 1
-        data[i] ~ Normal(predicted[3,:][i], σ)
+        data[i] ~ Normal(predicted[4,:][i], σ)
     end
 end
 
 model = fitSID(dat, prob)
 
-samples = 5000
+samples = 25000
 
 chain = sample(model, NUTS(.45), samples)
 chain_array = Array(chain)
@@ -87,16 +86,46 @@ chain_array = Array(chain)
 
 pl = scatter(diff(dat))
 
-for k in 1:5000
-    resol = solve(remake(prob,p=chain_array[rand(1:4000), 2:3]),Tsit5(),saveat=1)
+for k in 1:1000
+    resol = solve(remake(prob,p=chain_array[rand(1:24000), 2:4]),Tsit5(),saveat=1)
 
-    plot!(diff(resol[3,:]), alpha=0.1, color = "#BBBBBB", legend = false)
+    plot!(diff(resol[4,:]), alpha=0.1, color = "#d97259", legend = false)
+    plot!(resol[2,:], alpha=0.1, color = "#e08b22", legend = false)
 end
 
-pl
 
-@gif for i = 1:samples
-    scatter(diff(dat))
-    plot!(diff(solve(remake(prob,p=chain_array[rand(1:4000), 2:3]),Tsit5(),saveat=1)[3,:]))
 
-end every 10
+
+
+##### OUTPUTS
+
+
+a = solve(remake(prob,p=chain_array[rand(1:24000), 2:4]),Tsit5(),saveat=1)[2,:]
+b = diff(solve(remake(prob,p=chain_array[rand(1:24000), 2:4]),Tsit5(),saveat=1)[4,:])
+
+infected = a'
+dead = b'
+
+a = solve(remake(prob,p=chain_array[rand(1:24000), 2:4]),Tsit5(),saveat=1)[2,:]
+
+infected = vcat(infected,a')
+
+
+for i in 1:200
+    a = solve(remake(prob,p=chain_array[rand(1:24000), 2:4]),Tsit5(),saveat=1)[2,:]
+    b = diff(solve(remake(prob,p=chain_array[rand(1:24000), 2:4]),Tsit5(),saveat=1)[4,:])
+    infected = vcat(infected,a')
+    dead = vcat(dead,b')
+end
+
+DataFrame(a)
+
+using(Tables)
+
+CSV.write("ModelDrawsDead.csv", Tables.table(dead) , writeheader=false)
+CSV.write("ModelDrawsInfected.csv", Tables.table(infected), writeheader=false)
+
+
+CSV.write("ModelDraws.csv", q)
+#write csv to directory for use in .rmd
+CSV.write("ModelOut.csv", df)
