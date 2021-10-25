@@ -103,13 +103,12 @@ Now for the visualization of the different compartments:
 ```{r, echo=FALSE, results='hide',  message=FALSE, warning=FALSE}
 library(reshape2)
 
-#model simulations done in julia
-draws = read.csv("ModelDraws.csv")
-
 
 
 #help from: https://stackoverflow.com/questions/27826666/plotting-1000-lines-with-ggplot2
 
+
+#model simulations done in julia
 deaths  = read.csv("ModelDrawsDead.csv")
 infected  = read.csv("ModelDrawsInfected.csv")
 
