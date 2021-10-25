@@ -27,7 +27,7 @@ The model is
 
 The initial data from the plague is as follows: we have a time series of deaths recorded by the church in Eyam around the time of the great plague:
 
-```{r, echo=FALSE, results='hide',  message=FALSE, warning=FALSE}
+```{r, echo=FALSE, results='hide',  message=FALSE, warning=FALSE,  fig.width = 8, fig.height= 4}
 
 library(tidyverse)
 library(ggthemes)
@@ -55,6 +55,21 @@ ggplot(data = Eyam, aes(x = day, y = deaths))+
    
 ```
 
+
+We have priors:
+
+
+
+\[   
+\begin{aligned}
+  &\sigma \sim- \text { Inv-Gamma }(3,1)\\
+  &\beta \sim \mathcal{N}(0.9, 4)\\
+  &\gamma \sim \mathcal{N}(0.4, 4)\\
+  &\mu \sim \mathcal{N}(0.4, 4)
+\end{aligned}
+\]
+
+with every normal distribution truncated at zero and ten.\
 
 We want to make the following inferences --- first, we want to recover and view the posterior densities associated with our SIRD parameters. Second, we want to estimate the values for our other compartments, as we fit the model only to deaths.  \
 
@@ -129,7 +144,9 @@ ggplot(mdatDeath, aes(x = time,y =value)) +
 ```
 
 
-Notice how the infered infection category for which we lack any data has a larger range of uncertainty in the distribution of possible fits compared to the deaths time series for which we have data. 
+Notice how the infered infection category for which we lack any data has a larger range of uncertainty in the distribution of possible fits compared to the deaths time series for which we have data. \
+
+On a related note, even though this model is clearly a bad choice for this plague, and way too simple, the estimated death trajectories provide what seems like an intuitively more reasonable fit than the LOESS smooth. 
 
 
 
