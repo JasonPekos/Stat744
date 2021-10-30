@@ -1,0 +1,143 @@
+---
+title: "HW5"
+output: html_document
+df_print: paged
+number_sections: true
+---
+
+```{r, echo = FALSE, message = FALSE, warning = FALSE}
+
+library(tidyverse)
+library(ggthemes)
+library(ggmap)
+library(move)
+library(moveVis)
+
+
+register_google(key = ";)") ## remember to remove before pushing even once because the repo is public D:
+
+
+#from https://www.movebank.org/cms/webapp?gwt_fragment=page=studies,path=study492444603
+
+WolfDat = move("GreyWolfData.csv")  #Import Wolf Data
+```
+
+# Spatial Plot
+
+Grabbing some wolf data from movebank, we can plot the movement paths with:
+
+```{r, echo = FALSE, message = FALSE, warning = FALSE}
+
+#WolfDataAligned = align_move(WolfDat) #align, but my computer doesn't have enough ram to do this ..
+WolfDF = as.data.frame(WolfDat)     #Make into dataframe for ggplotting
+
+ids = split(WolfDat) #Split for plotting individual wolves.
+
+#Did this manually because was running into a weird code error:
+#-110.7031 max long
+#-115.7919 min long
+
+#60.56856 max lat
+#55.62262 min lat
+
+#are the general outer bounds for all wolves
+
+amb = c(left = -115.7919, right = -110.70310, top  = 60.56856, bottom  =55.62262)
+
+amb_lower_right = c(left = -112.7919, right = -110.70310, top  = 58.0, bottom  =57.3)
+
+map = get_map(amb, source="stamen", maptype = "terrain", zoom=8)
+
+ggmap(map)+
+   geom_path(data = WolfDF, aes(x = location.long, y = location.lat, color = individual.local.identifier))+
+   theme(legend.position  = "none") +
+   ggtitle("movement pattern for alberta wolves") 
+```
+
+This is pretty rough for a few reasons:
+
+**First**, it isn't easy to tell apart some of the different paths, even with the color aesthetic set to the individual IDs.
+
+
+**Second**, Without some sort of indicator for time, it's not as as meaningful to know that two wolves shared the same location --- they could have visited this place years apart. 
+
+
+I think an animation could be helpful here, but first, some facet plots to get a better idea of what is going on (limited to some random subset of wolves, as 40 here is unreasonable):
+
+# Facet Plots
+
+```{r, echo = FALSE, message = FALSE, warning = FALSE}
+WolfDF %>% filter(individual.local.identifier == "X13790" |
+                  individual.local.identifier == "X13791" |
+                  individual.local.identifier == "X13792" |
+                  individual.local.identifier == "X15508" |
+                  individual.local.identifier == "X32268" |
+                  individual.local.identifier == "X32267" |
+                  individual.local.identifier == "X32269") ->redDF
+
+#using help from Jaap
+#https://stackoverflow.com/a/33302968/12369476
+
+p1 = ggmap(map)+
+     geom_path(data = redDF, aes(x = location.long, y = location.lat, color = timestamps))+
+     ggtitle("movement pattern for alberta wolves") +
+     scale_x_continuous(breaks = c(-115.8, -110.7))
+
+
+p1 + facet_wrap(~individual.local.identifier)
+```
+\
+
+Most wolves stick in one spot in the bottom right hand corner, with some occasionally travelling very far west or north.\
+
+# Helper Plot
+
+There's an additional concern here: different wolves are tracked and un-tracked at different times. See:
+
+```{r, echo = FALSE, message = FALSE, warning = FALSE}
+ggplot(data = WolfDF, aes(x = timestamp, y = individual.local.identifier)) + geom_line() +
+  theme_tufte() +
+  ggtitle("When are Certain Wolves Tracked?") +
+  labs(x = "Date", y = "Individual Wolf") +
+  theme(axis.ticks.x = element_blank())
+
+```
+
+
+# Animation
+
+We can animate the initial plot with gganimate, which solves a suprising amount of issues:
+
+
+```{r, echo = FALSE, message = FALSE, warning = FALSE}
+library(gganimate)
+library(transformr)
+
+mmap = ggmap(map)+
+   geom_point(data = WolfDF, aes(x = location.long, y = location.lat, color = individual.local.identifier))+
+  geom_line(data = WolfDF, aes(x = location.long, y = location.lat, color = individual.local.identifier))
+   theme(legend.position  = "none") +
+   ggtitle("movement pattern for alberta wolves")  
+     
+
+
+anim = mmap + transition_time(timestamp) +
+  labs(title = "Year: {frame_time}") +
+  shadow_wake(wake_length = 0.2) +
+  ease_aes("linear") +
+  labs(color = "Individual Tag\n")
+  
+animate(
+  anim,
+  fps = 15
+)
+
+```
+\
+
+There's probably a better / nicer way to do this --- I'm also not sure that ease_aes() is working correctly  --- but I coundn't iterate fast enough due to compile time for me to create a better animated final product. \
+
+The general warnings about spatial plots -- mostly around projections, bining, and color choice don't apply here. Perhaps because we can already tell apart the different wolves in the animated case, we could encode something else with colour (e.g temperature?) to see when they move north / south. \
+
+
+

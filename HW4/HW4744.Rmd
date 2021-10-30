@@ -31,8 +31,6 @@ The initial data from the plague is as follows: we have a time series of deaths 
 
 library(tidyverse)
 library(ggthemes)
-
-library(JuliaCall)
 #deaths in eyam
 deaths = c(3,4,1,3,1,3,1,1,0,0,1,0,1,1,2,0,1,2,0,1,2,
               1,1,4,2,2,1,2,0,1,0,1,1,2,3,6,1,0,0,0,3,0,
@@ -40,10 +38,9 @@ deaths = c(3,4,1,3,1,3,1,1,0,0,1,0,1,1,2,0,1,2,0,1,2,
               3,5,1,3,4,2,4,2,1,1,1,3,0,2,1,0,3,0,2,1,1,
               2,0,0,2,1,3,1,0,0,2,0,0,0,0,1,0,1,1,1,3,0,
               0,0,0,0,1,0,1,1,0,1,1,2,0,2,0,0,1,1,2,1,1,
-              0,2,1,0,0,0,0,0,0,0,0,0,1,0,0,0,1)
-## BMB: could read from a data file ???
+              0,2,1,0,0,0,0,0,0,0,0,0,1,0,0,0,1);
 
-day = c(1:length(deaths))  ## don't need c(); seq_along(deaths) slightly better
+day = c(1:length(deaths))
 Eyam = tibble(day, deaths)
 ggplot(data = Eyam, aes(x = day, y = deaths))+
   geom_point() +
@@ -53,14 +50,12 @@ ggplot(data = Eyam, aes(x = day, y = deaths))+
   scale_color_hue(labels = c("LOESS Smooth")) +
   labs("color" = "Legend") +
   geom_hline(yintercept=0, linetype="dashed", color = "black")
+  
+   
 ```
 
-**BMB: confidence interval on smooth goes below zero.  Could limit scale with `oob=scales::squish`, or
-better to use a smoother with a log link (e.g. `geom_smooth(method="mgcv", method.args=list(family=quasipoisson))`).
-Legend seems a little weird (I think I would put this in a footnote/subtitle/caption rather than as a legend)**
 
 We have priors:
-
 
 
 \[   
@@ -74,7 +69,6 @@ We have priors:
 
 
 with every normal distribution truncated at zero and ten, and $\sigma$ as the expected noise in our data.\
-**BMB: I still have Opinions about these priors, but not relevant here**
 
 We want to make the following inferences --- first, we want to recover and view the posterior densities associated with our SIRD parameters. Second, we want to estimate the values for our other compartments, as we fit the model only to deaths.  \
 
@@ -85,9 +79,8 @@ The shaded area represents the 80% CI, with the point estimate at the posterior 
 
 
 ```{r, echo=FALSE, results='hide',  message=FALSE, warning=FALSE}
-chains = tibble(read.csv("ModelOut.csv")) ## BMB: could just use read_csv(), would get as a tibble immediately
+chains = tibble(read.csv("ModelOut.csv"))
 chains = rename(chains, sigma = σ, beta = β, gamma = γ, mu = μ) #dumb, from julia code
-## BMB: can you get away with keeping the symbols through the R code? (Might work, although much more fragile/may break in some contexts)
 
 library(bayesplot)
 
@@ -99,16 +92,14 @@ pl_areas = mcmc_areas(chains,
 
 pl_areas +
   ggtitle("Estimated Posterior Distributions") +
-  theme_fivethirtyeight() +
-  scale_y_discrete(labels = function(x) parse(text=x))
+  theme_fivethirtyeight()
+  
 ```
 
-**BMB: this is a little tricky, but what are the units on the y-axis? I don't think beta and mu match, unless you've scaled beta appropriately (N=1).
-Depending on the intended audience, you might want to add natural-language descriptions of the parameters ("death rate", "contact rate")**
 
 Above we only plotted two parameters, because the scope of the other parameters makes the graph illegible if they are plotted together.\
 
-We can plot every posterior distribution separately also:
+We can plot every posterior distribution seperately also:
 
 ```{r, echo=FALSE, results='hide',  message=FALSE, warning=FALSE}
 
@@ -117,6 +108,8 @@ lft = mcmc_dens(chains, pars = c("beta", "gamma", "mu", "sigma")) +
 
 lft  
 ```
+
+
 
 Now for the visualization of the different compartments:
 
@@ -150,9 +143,7 @@ mdatInf$time = as.numeric(gsub("time", "", mdatInf$variable))
 mdatDeath$time = as.numeric(gsub("time", "", mdatDeath$variable))
 
 
-## BMB: there's probably a tidier way to do the manipulations above ...
-
-gg2 <- ggplot(mdatDeath, aes(x = time,y =value)) +
+ggplot(mdatDeath, aes(x = time,y =value)) +
   geom_line(size=0.2, alpha=0.1, aes(group =  trial, color="blue")) +
   geom_point(data =  Eyam, aes(x = day, y = deaths)) +
   geom_line(data = mdatInf, size=0.2, alpha=0.1, aes(group =  trial, color = "red"))+
@@ -160,24 +151,18 @@ gg2 <- ggplot(mdatDeath, aes(x = time,y =value)) +
   ggtitle("Deaths per Day in Eyam With Posterior Draws, 1665")   +
   scale_color_manual(labels = c("Deaths (red)", "Infected (blue)"), values = c("red", "blue")) +
   labs(color = "Legend")
-print(gg2)
+
+  
 ```
 
 
-Notice how the inferred infection category (for which we lack any data) has a larger range of uncertainty in the distribution of possible fits compared to the deaths time series for which we have data. \
+Notice how the infered infection category for which we lack any data has a larger range of uncertainty in the distribution of possible fits compared to the deaths time series for which we have data. \
 
 On a related note, even though this model is clearly a bad choice for this plague, and way too simple, the estimated death trajectories provide what seems like an intuitively more reasonable fit than the LOESS smooth. 
 
 
-**BMB: we can fit a unimodal spline (although this seems to oversmooth ...)**
 
-```{r}
-uu <- with(Eyam, unireg(day, deaths, sigmasq=1))
-upred <- tibble(day=Eyam$day, deaths = predict(uu, newdata=Eyam$day))
-gg2 + geom_line(data=upred, aes(x=day, y=deaths), colour="purple", lwd=2)
-```
 
-**BMB: mark 2.2/3. There's a lot of effort here, but I think more of the emphasis was on the modeling rather than on the graphical display. How did you choose colours etc.? Do we need to see the whole distributions? Would violin plots be more compact? Or maybe we only need 50% and 95% intervals?**
 
 
 
