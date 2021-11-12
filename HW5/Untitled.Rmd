@@ -139,5 +139,5 @@ There's probably a better / nicer way to do this --- I'm also not sure that ease
 
 The general warnings about spatial plots -- mostly around projections, bining, and color choice don't apply here. Perhaps because we can already tell apart the different wolves in the animated case, we could encode something else with colour (e.g temperature?) to see when they move north / south. \
 
-
+JD: This is obviously really cool, but hard to interpret. You should tell your viewer how the lines are lingering, and for how long (I guess that's what shadow_wake is). It would also be cool to allow users to pause and get info by hovering. Somehow. I kind of feel like the time of day in the timestamp is noise, maybe that should be hidden (although that sort of goes against my pausing idea). I also feel like it would be better to make the water grayer (but that could be my color problems). Grade 2.3/3
 
